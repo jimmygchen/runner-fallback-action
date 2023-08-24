@@ -33,7 +33,29 @@ jobs:
 
   test-output:
     needs: test
-    runs-on: ${{ needs.test.outputs.use-runner }}
+    runs-on: ${{ fromJson(needs.test.outputs.use-runner )}}
     steps:
       - name: Do something
-        run: echo "Doing something on ${{ needs.test.outputs.use-runner }}"
+        run: echo "Doing something on ${{ fromJson(needs.test.outputs.use-runner) }}"
+
+  test-multiple-labels:
+    runs-on: ubuntu-latest
+    outputs:
+      use-runner: ${{ steps.test-action.outputs.use-runner }}
+    steps:
+    - uses: actions/checkout@v3
+    - id: test-action
+      uses: ./
+      with:
+        primary-runner: 'self-hosted,linux'
+        fallback-runner: 'linux,x64'
+        github-token: ${{ secrets.TEST_GITHUB_TOKEN }}
+    - name: Check output
+      run: echo "Runner to use is ${{ steps.test-action.outputs.use-runner }}"        
+
+  test-multiple-labels-output:
+    needs: test-multiple-labels
+    runs-on: ${{ fromJson(needs.test-multiple-labels.outputs.use-runner )}}
+    steps:
+      - name: Do something
+        run: echo "Doing something on ${{ fromJson(needs.test-multiple-labels.outputs.use-runner) }}"

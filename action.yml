@@ -1,8 +1,9 @@
 name: 'Check Runner Availability'
 description: 'Check for availability of self-hosted GitHub runners and fallback to GitHub-hosted runners if needed'
 author: '@jimmygchen'
-icon: activity
-color: blue
+branding:
+  icon: activity
+  color: blue
 inputs:
   github-token:
     description: 'GitHub token with repo and actions scope for querying runner information'

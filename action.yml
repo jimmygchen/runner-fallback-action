@@ -1,13 +1,25 @@
-name: 'Wait'
-description: 'Wait a designated number of milliseconds'
+name: 'Check Runners'
+description: 'Check for availability of self-hosted GitHub runners and fallback to GitHub-hosted runners if needed'
+author: '@jimmygchen'
 inputs:
-  milliseconds:  # id of input
-    description: 'number of milliseconds to wait'
+  github-token:
+    description: 'GitHub token'
     required: true
-    default: '1000'
+  owner:
+    description: 'Repository owner'
+    required: true
+  repo:
+    description: 'Repository name'
+    required: true
+  primary-runner:
+    description: 'Comma-separated list of labels for the primary runner, [self-hosted, linux]'
+    required: true
+  fallback-runner:
+    description: 'Name or labels of the fallback runner, e.g. ubuntu-latest'
+    required: true
 outputs:
-  time: # output will be available to future steps
-    description: 'The current time after waiting'
+  use-runner:
+    description: 'The runner to use, based on availability'
 runs:
   using: 'node16'
   main: 'dist/index.js'

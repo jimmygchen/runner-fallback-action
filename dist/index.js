@@ -1,6 +1,73 @@
 require('./sourcemap-register.js');/******/ (() => { // webpackBootstrap
 /******/ 	var __webpack_modules__ = ({
 
+/***/ 932:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+const core = __nccwpck_require__(186);
+const httpClient = __nccwpck_require__(255);
+
+async function checkRunner({ token, owner, repo, primaryRunnerLabels, fallbackRunner }) {
+  const http = new httpClient.HttpClient('http-client', [new httpClient.BearerCredentialHandler(token)]);
+  const response = await http.getJson(`https://api.github.com/repos/${owner}/${repo}/actions/runners`);
+
+  if (response.statusCode !== 200) {
+    return { error: `Failed to get runners. Status code: ${response.statusCode}` };
+  }
+
+  const runners = response.result.runners || [];
+  let useRunner = fallbackRunner;
+  let primaryIsOnline = false;
+
+  for (const runner of runners) {
+    if (runner.status === 'online') {
+      const runnerLabels = runner.labels.map(label => label.name);
+      if (primaryRunnerLabels.every(label => runnerLabels.includes(label))) {
+        primaryIsOnline = true;
+        useRunner = primaryRunnerLabels.join(',');
+        break;
+      }
+    }
+  }
+
+  return { useRunner, primaryIsOnline };
+}
+
+async function main() {
+  try {
+    const inputs = {
+      token: core.getInput('github-token', { required: true }),
+      owner: core.getInput('owner', { required: true }),
+      repo: core.getInput('repo', { required: true }),
+      primaryRunnerLabels: core.getInput('primary-runner', { required: true }).split(','),
+      fallbackRunner: core.getInput('fallback-runner', { required: true }),
+    };
+
+    const { useRunner, primaryIsOnline, error } = await checkRunner(inputs);
+
+    if (error) {
+      core.setFailed(error);
+      return;
+    }
+
+    core.info(`Primary runner is online: ${primaryIsOnline}`);
+    core.info(`Using runner: ${useRunner}`);
+
+    core.setOutput('use-runner', useRunner);
+  } catch (error) {
+    core.setFailed(error.message);
+  }
+}
+
+module.exports = { checkRunner };
+
+if (require.main === require.cache[eval('__filename')]) {
+  main();
+}
+
+
+/***/ }),
+
 /***/ 351:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
@@ -1211,6 +1278,19 @@ class HttpClientResponse {
             }));
         });
     }
+    readBodyBuffer() {
+        return __awaiter(this, void 0, void 0, function* () {
+            return new Promise((resolve) => __awaiter(this, void 0, void 0, function* () {
+                const chunks = [];
+                this.message.on('data', (chunk) => {
+                    chunks.push(chunk);
+                });
+                this.message.on('end', () => {
+                    resolve(Buffer.concat(chunks));
+                });
+            }));
+        });
+    }
 }
 exports.HttpClientResponse = HttpClientResponse;
 function isHttps(requestUrl) {
@@ -1715,7 +1795,13 @@ function getProxyUrl(reqUrl) {
         }
     })();
     if (proxyVar) {
-        return new URL(proxyVar);
+        try {
+            return new URL(proxyVar);
+        }
+        catch (_a) {
+            if (!proxyVar.startsWith('http://') && !proxyVar.startsWith('https://'))
+                return new URL(`http://${proxyVar}`);
+        }
     }
     else {
         return undefined;
@@ -1725,6 +1811,10 @@ exports.getProxyUrl = getProxyUrl;
 function checkBypass(reqUrl) {
     if (!reqUrl.hostname) {
         return false;
+    }
+    const reqHost = reqUrl.hostname;
+    if (isLoopbackAddress(reqHost)) {
+        return true;
     }
     const noProxy = process.env['no_proxy'] || process.env['NO_PROXY'] || '';
     if (!noProxy) {
@@ -1751,13 +1841,24 @@ function checkBypass(reqUrl) {
         .split(',')
         .map(x => x.trim().toUpperCase())
         .filter(x => x)) {
-        if (upperReqHosts.some(x => x === upperNoProxyItem)) {
+        if (upperNoProxyItem === '*' ||
+            upperReqHosts.some(x => x === upperNoProxyItem ||
+                x.endsWith(`.${upperNoProxyItem}`) ||
+                (upperNoProxyItem.startsWith('.') &&
+                    x.endsWith(`${upperNoProxyItem}`)))) {
             return true;
         }
     }
     return false;
 }
 exports.checkBypass = checkBypass;
+function isLoopbackAddress(host) {
+    const hostLower = host.toLowerCase();
+    return (hostLower === 'localhost' ||
+        hostLower.startsWith('127.') ||
+        hostLower.startsWith('[::1]') ||
+        hostLower.startsWith('[0:0:0:0:0:0:0:1]'));
+}
 //# sourceMappingURL=proxy.js.map
 
 /***/ }),
@@ -2688,23 +2789,6 @@ exports["default"] = _default;
 
 /***/ }),
 
-/***/ 258:
-/***/ ((module) => {
-
-let wait = function (milliseconds) {
-  return new Promise((resolve) => {
-    if (typeof milliseconds !== 'number') {
-      throw new Error('milliseconds not a number');
-    }
-    setTimeout(() => resolve("done!"), milliseconds)
-  });
-};
-
-module.exports = wait;
-
-
-/***/ }),
-
 /***/ 491:
 /***/ ((module) => {
 
@@ -2831,34 +2915,13 @@ module.exports = require("util");
 /******/ 	if (typeof __nccwpck_require__ !== 'undefined') __nccwpck_require__.ab = __dirname + "/";
 /******/ 	
 /************************************************************************/
-var __webpack_exports__ = {};
-// This entry need to be wrapped in an IIFE because it need to be isolated against other modules in the chunk.
-(() => {
-const core = __nccwpck_require__(186);
-const wait = __nccwpck_require__(258);
-
-
-// most @actions toolkit packages have async methods
-async function run() {
-  try {
-    const ms = core.getInput('milliseconds');
-    core.info(`Waiting ${ms} milliseconds ...`);
-
-    core.debug((new Date()).toTimeString()); // debug is only output if you set the secret `ACTIONS_RUNNER_DEBUG` to true
-    await wait(parseInt(ms));
-    core.info((new Date()).toTimeString());
-
-    core.setOutput('time', new Date().toTimeString());
-  } catch (error) {
-    core.setFailed(error.message);
-  }
-}
-
-run();
-
-})();
-
-module.exports = __webpack_exports__;
+/******/ 	
+/******/ 	// startup
+/******/ 	// Load entry module and return exports
+/******/ 	// This entry module is referenced by other modules so it can't be inlined
+/******/ 	var __webpack_exports__ = __nccwpck_require__(932);
+/******/ 	module.exports = __webpack_exports__;
+/******/ 	
 /******/ })()
 ;
 //# sourceMappingURL=index.js.map

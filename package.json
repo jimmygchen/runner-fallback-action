@@ -1,7 +1,7 @@
 {
-  "name": "javascript-action",
+  "name": "runner-fallback-action",
   "version": "1.0.0",
-  "description": "JavaScript Action Template",
+  "description": "Github Runner Fallback Action",
   "main": "index.js",
   "scripts": {
     "lint": "eslint .",
@@ -11,21 +11,22 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/actions/javascript-action.git"
+    "url": "git+https://github.com/jimmygchen/runner-fallback-action.git"
   },
   "keywords": [
     "GitHub",
     "Actions",
-    "JavaScript"
+    "Runner"
   ],
   "author": "",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/actions/javascript-action/issues"
+    "url": "https://github.com/jimmygchen/runner-fallback-action/issues"
   },
-  "homepage": "https://github.com/actions/javascript-action#readme",
+  "homepage": "https://github.com/jimmygchen/runner-fallback-action#readme",
   "dependencies": {
-    "@actions/core": "^1.10.0"
+    "@actions/core": "^1.10.0",
+    "@actions/http-client": "^2.1.1"
   },
   "devDependencies": {
     "@vercel/ncc": "^0.36.1",

@@ -10,22 +10,23 @@ Github action to determine the availability of self-hosted runners, and fallback
 
 ```yaml
 jobs:
-  determine_runner:
+  determine-runner:
     runs-on: ubuntu-latest
     outputs:
-      runner: ${{ steps.set_runner.outputs.use-runner }}
+      runner: ${{ steps.set-runner.outputs.use-runner }}
     steps:
       - name: Determine which runner to use
-        id: set_runner
+        id: set-runner
         uses: runner-fallback-action@v1
         with:
           primary-runner: "self-hosted,linux"
           fallback-runner: "ubuntu-latest"
+          github-token: ${{ secrets.YOUR_GITHUB_TOKEN }}
 
-  another_job:
-    needs: determine_runner
-    runs-on: ${{ needs.determine_runner.outputs.runner }}
+  another-job:
+    needs: determine-runner
+    runs-on: ${{ fromJson(needs.determine-runner.outputs.runner) }}
     steps:
       - name: Do something
-        run: echo "Doing something on ${{ needs.determine_runner.outputs.runner }}"
+        run: echo "Doing something on ${{ needs.determine-runner.outputs.runner }}"
 ```

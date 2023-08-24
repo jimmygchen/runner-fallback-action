@@ -36,7 +36,7 @@ jobs:
     runs-on: ${{ fromJson(needs.test.outputs.use-runner )}}
     steps:
       - name: Do something
-        run: echo "Doing something on ${{ fromJson(needs.test.outputs.use-runner) }}"
+        run: echo "Doing something on ${{ needs.test.outputs.use-runner }}"
 
   test-multiple-labels:
     runs-on: ubuntu-latest
@@ -52,10 +52,3 @@ jobs:
         github-token: ${{ secrets.TEST_GITHUB_TOKEN }}
     - name: Check output
       run: echo "Runner to use is ${{ steps.test-action.outputs.use-runner }}"        
-
-  test-multiple-labels-output:
-    needs: test-multiple-labels
-    runs-on: ${{ fromJson(needs.test-multiple-labels.outputs.use-runner )}}
-    steps:
-      - name: Do something
-        run: echo "Doing something on ${{ fromJson(needs.test-multiple-labels.outputs.use-runner) }}"

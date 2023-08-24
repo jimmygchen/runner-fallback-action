@@ -20,6 +20,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
-    - uses: ./
+    - id: test-action
+      uses: ./
       with:
-        milliseconds: 1000
+        primary-runner: 'self-hosted,linux'
+        fallback-runner: 'ubuntu-latest'
+        github-token: ${{ secrets.TEST_GITHUB_TOKEN }}
+    - name: Check output
+      run: echo "Runner to use is ${{ steps.test-action.outputs.use-runner }}"        

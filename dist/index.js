@@ -33,7 +33,8 @@ async function checkRunner({ token, owner, repo, primaryRunnerLabels, fallbackRu
     }
   }
 
-  return { useRunner, primaryIsOnline };
+  // return a JSON string so that it can be parsed using `fromJson`, e.g. fromJson('["self-hosted", "linux"]')
+  return { useRunner: JSON.stringify(useRunner.split(',')), primaryIsOnline };
 }
 
 async function main() {

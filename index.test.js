@@ -38,7 +38,7 @@ describe('checkRunner', () => {
     });
 
     expect(result).toEqual({
-      useRunner: 'self-hosted,linux',
+      useRunner: '["self-hosted","linux"]',
       primaryIsOnline: true,
     });
   });
@@ -68,7 +68,7 @@ describe('checkRunner', () => {
     });
 
     expect(result).toEqual({
-      useRunner: 'ubuntu-latest',
+      useRunner: '["ubuntu-latest"]',
       primaryIsOnline: false,
     });
   });

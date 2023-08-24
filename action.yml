@@ -1,25 +1,19 @@
-name: 'Check Runners'
+name: 'Check Runner Availability'
 description: 'Check for availability of self-hosted GitHub runners and fallback to GitHub-hosted runners if needed'
 author: '@jimmygchen'
 inputs:
   github-token:
-    description: 'GitHub token'
-    required: true
-  owner:
-    description: 'Repository owner'
-    required: true
-  repo:
-    description: 'Repository name'
+    description: 'GitHub token with repo and actions scope for querying runner information'
     required: true
   primary-runner:
-    description: 'Comma-separated list of labels for the primary runner, [self-hosted, linux]'
+    description: 'Comma-separated list of labels for the primary runner, e.g. self-hosted,linux'
     required: true
   fallback-runner:
     description: 'Name or labels of the fallback runner, e.g. ubuntu-latest'
     required: true
 outputs:
   use-runner:
-    description: 'The runner to use, based on availability'
+    description: 'The runner to use, either the primary or the fallback runner, based on availability'
 runs:
   using: 'node16'
   main: 'dist/index.js'

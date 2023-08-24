@@ -25,5 +25,6 @@ jobs:
       with:
         primary-runner: 'self-hosted,linux'
         fallback-runner: 'ubuntu-latest'
+        github-token: ${{ secrets.TEST_GITHUB_TOKEN }}
     - name: Check output
       run: echo "Runner to use is ${{ steps.test-action.outputs.use-runner }}"        

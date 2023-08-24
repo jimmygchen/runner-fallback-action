@@ -34,11 +34,14 @@ async function checkRunner({ token, owner, repo, primaryRunnerLabels, fallbackRu
 }
 
 async function main() {
+  const githubRepository = process.env.GITHUB_REPOSITORY;
+  const [owner, repo] = githubRepository.split("/");
+
   try {
     const inputs = {
+      owner,
+      repo,
       token: core.getInput('github-token', { required: true }),
-      owner: core.getInput('owner', { required: true }),
-      repo: core.getInput('repo', { required: true }),
       primaryRunnerLabels: core.getInput('primary-runner', { required: true }).split(','),
       fallbackRunner: core.getInput('fallback-runner', { required: true }),
     };

@@ -8,8 +8,11 @@ const core = __nccwpck_require__(186);
 const httpClient = __nccwpck_require__(255);
 
 async function checkRunner({ token, owner, repo, primaryRunnerLabels, fallbackRunner }) {
-  const http = new httpClient.HttpClient('http-client', [new httpClient.BearerCredentialHandler(token)]);
-  const response = await http.getJson(`https://api.github.com/repos/${owner}/${repo}/actions/runners`);
+  const http = new httpClient.HttpClient('http-client');
+  const headers = {
+    'Authorization': `Bearer ${token}`,
+  };
+  const response = await http.getJson(`https://api.github.com/repos/${owner}/${repo}/actions/runners`, headers);
 
   if (response.statusCode !== 200) {
     return { error: `Failed to get runners. Status code: ${response.statusCode}` };

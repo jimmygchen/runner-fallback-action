@@ -4,7 +4,7 @@
   <a href="https://github.com/jimmygchen/runner-fallback-action/actions"><img alt="javscript-action status" src="https://github.com/jimmygchen/runner-fallback-action/workflows/units-test/badge.svg"></a>
 </p>
 
-Github action to determine the availability of primary runners (usually self-hosted runners), and fallback to a different runner if the primary runners are offline.
+Github action to determine the availability of self-hosted runners, and fallback to a GitHub runner if the primary runners are offline.
 
 ## Usage
 

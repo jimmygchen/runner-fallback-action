@@ -11,7 +11,7 @@ jobs:
   units:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - run: npm ci
     - run: npm test
 
@@ -21,7 +21,7 @@ jobs:
     outputs:
       use-runner: ${{ steps.test-action.outputs.use-runner }}
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - id: test-action
       uses: ./
       with:
@@ -43,7 +43,7 @@ jobs:
     outputs:
       use-runner: ${{ steps.test-action.outputs.use-runner }}
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - id: test-action
       uses: ./
       with:

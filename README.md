@@ -24,7 +24,7 @@ jobs:
     steps:
       - name: Determine which runner to use
         id: set-runner
-        uses: runner-fallback-action@v1
+        uses: jimmygchen/runner-fallback-action@v1
         with:
           primary-runner: "self-hosted,linux"
           fallback-runner: "ubuntu-latest"

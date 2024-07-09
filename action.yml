@@ -18,5 +18,5 @@ outputs:
   use-runner:
     description: 'The runner to use, either the primary or the fallback runner, based on availability'
 runs:
-  using: 'node16'
+  using: 'node20'
   main: 'dist/index.js'

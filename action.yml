@@ -14,6 +14,12 @@ inputs:
   fallback-runner:
     description: 'Name or labels of the fallback runner, e.g. ubuntu-latest'
     required: true
+  organization:
+    description: "GitHub organization name to check for self-hosted runners (mutually exclusive with enterprise), if not supplied we will use user's personal runners"
+    required: false
+  enterprise:
+    description: "GitHub enterprise name to check for self-hosted runners (mutually exclusive with organization), if not supplied we will use user's personal runners"
+    required: false
 outputs:
   use-runner:
     description: 'The runner to use, either the primary or the fallback runner, based on availability'

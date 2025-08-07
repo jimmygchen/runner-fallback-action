@@ -12,8 +12,34 @@ This output can then used on the `runs-on` property of subsequent jobs.
 
 Note: In order to support an array of labels for the `runs-on` field, the output is formatted as a JSON string and needs to be parsed using `fromJson`. See example usage below.
 
+
+
 ## Usage
 
+### ✏️ Inputs
+
+#### Required
+
+|       Name        |                                          Description                                                       |
+| ----------------- | ---------------------------------------------------------------------------------------------------------- |
+|  `github-token`   | A token that can access the `list action runners` for the given context (e.g. user repo, org, enterprise). |
+|  `primary-runner` | A comma separated list of labels for the _primary_ runner (e.g. 'self-hosted,linux').                      |
+| `fallback-runner` | A comma separated list of labels for the _fallback_ runner (e.g. 'self-hosted,linux').                     |
+
+
+#### Optional
+---
+
+There are three ways runners can be allowed to run against a repo: User, Organization, Enterprise. The following options allow you to switch the implementation to use one of the other specified levels. **_Note:_** You can only provide one of the values.
+
+|       Name       |                     Description                                    |
+| ---------------- | ------------------------------------------------------------------ |
+| `organization`   | The name of the github organization (e.g. `My-Github-Org`)         |
+| `enterprise`     | The name of the github enterprise (e.g. `My-Github-Ent`)           |
+
+
+
+### Example
 ```yaml
 jobs:
   # Job to 

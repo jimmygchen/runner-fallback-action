@@ -38,9 +38,6 @@ async function checkRunner({
 	}
 
 	const runners = response.result.runners || [];
-
-	console.dir({ runners }, { depth: null });
-
 	let useRunner = fallbackRunner;
 	let primaryIsOnline = false;
 

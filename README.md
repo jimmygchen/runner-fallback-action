@@ -29,6 +29,7 @@ jobs:
           primary-runner: "self-hosted,linux"
           fallback-runner: "ubuntu-latest"
           github-token: ${{ secrets.YOUR_GITHUB_TOKEN }}
+          check-org-runners: false  # set to true to check org-level runners
 
   another-job:
     needs: determine-runner

@@ -5,6 +5,9 @@ branding:
   icon: activity
   color: blue
 inputs:
+  check-org-runners:
+    description: 'If true it will look on the organization runners instead of repo runners'
+    required: false
   github-token:
     description: 'GitHub token with repo and actions scope for querying runner information'
     required: true

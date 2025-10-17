@@ -24,6 +24,15 @@ describe('checkRunner', () => {
         runners: [
           {
             status: 'online',
+            busy: true,
+            labels: [
+              { name: 'self-hosted' },
+              { name: 'linux' },
+            ],
+          },
+          {
+            status: 'online',
+            busy: false,
             labels: [
               { name: 'self-hosted' },
               { name: 'linux' },
@@ -38,11 +47,61 @@ describe('checkRunner', () => {
       apiPath: 'repos/fake-owner/fake-repo/actions/runners',
       primaryRunnerLabels: ['self-hosted', 'linux'],
       fallbackRunner: 'ubuntu-latest',
+      primariesRequired: 1,
     });
 
     expect(result).toEqual({
       useRunner: '["self-hosted","linux"]',
       primaryIsOnline: true,
+      sufficientPrimaries: true,
+    });
+  });
+
+  it('should use the fallback runner if primaries are online but busy', async () => {
+    mockGetJson.mockResolvedValue({
+      statusCode: 200,
+      result: {
+        runners: [
+          {
+            status: 'online',
+            busy: true,
+            labels: [
+              { name: 'self-hosted' },
+              { name: 'linux' },
+            ],
+          },
+          {
+            status: 'online',
+            busy: true,
+            labels: [
+              { name: 'self-hosted' },
+              { name: 'linux' },
+            ],
+          },
+          {
+            status: 'online',
+            busy: false,
+            labels: [
+              { name: 'self-hosted' },
+              { name: 'linux' },
+            ],
+          },
+        ],
+      },
+    });
+
+    const result = await checkRunner({
+      token: 'fake-token',
+      apiPath: 'repos/fake-owner/fake-repo/actions/runners',
+      primaryRunnerLabels: ['self-hosted', 'linux'],
+      fallbackRunner: 'ubuntu-latest',
+      primariesRequired: 3,
+    });
+
+    expect(result).toEqual({
+      useRunner: '["ubuntu-latest"]',
+      primaryIsOnline: true,
+      sufficientPrimaries: false,
     });
   });
 
@@ -72,6 +131,7 @@ describe('checkRunner', () => {
     expect(result).toEqual({
       useRunner: '["ubuntu-latest"]',
       primaryIsOnline: false,
+      sufficientPrimaries: false,
     });
   });
 

@@ -5,6 +5,7 @@ async function checkRunner({
   token,
   primaryRunnerLabels,
   fallbackRunner,
+  primariesRequired,
   apiPath,
 }) {
   const http = new httpClient.HttpClient("http-client");
@@ -26,12 +27,30 @@ async function checkRunner({
   const runners = response.result.runners || [];
   let useRunner = fallbackRunner;
   let primaryIsOnline = false;
+  let sufficientPrimaries = false;
+  let primariesAvailableCount = 0;
 
   for (const runner of runners) {
     if (runner.status === "online") {
       const runnerLabels = runner.labels.map((label) => label.name);
       if (primaryRunnerLabels.every((label) => runnerLabels.includes(label))) {
         primaryIsOnline = true;
+
+        // Is the number of primaries important? If so, keep track of them
+        if (primariesRequired !== undefined) {
+          // if we need more primaries and this one is busy, keep looking
+          if (runner.busy === true) {
+           continue;
+          }
+
+          // if we still do not have enough primaries, keep looking
+          primariesAvailableCount++;
+          if (primariesAvailableCount < primariesRequired) {
+            continue;
+          }
+        }
+
+        sufficientPrimaries = true;
         useRunner = primaryRunnerLabels.join(",");
         break;
       }
@@ -39,7 +58,7 @@ async function checkRunner({
   }
 
   // return a JSON string so that it can be parsed using `fromJson`, e.g. fromJson('["self-hosted", "linux"]')
-  return { useRunner: JSON.stringify(useRunner.split(",")), primaryIsOnline };
+  return { useRunner: JSON.stringify(useRunner.split(",")), primaryIsOnline, sufficientPrimaries };
 }
 
 async function main() {
@@ -64,9 +83,10 @@ async function main() {
       token: core.getInput('github-token', { required: true }),
       primaryRunnerLabels: core.getInput('primary-runner', { required: true }).split(','),
       fallbackRunner: core.getInput('fallback-runner', { required: true }),
+      primariesRequired: core.getInput('primaries-required', { required: false }),
     };
 
-    const { useRunner, primaryIsOnline, error } = await checkRunner(inputs);
+    const { useRunner, primaryIsOnline, sufficientPrimaries, error } = await checkRunner(inputs);
 
     if (error) {
       core.setFailed(error);
@@ -74,6 +94,7 @@ async function main() {
     }
 
     core.info(`Primary runner is online: ${primaryIsOnline}`);
+    core.info(`Sufficient primary runners available: ${sufficientPrimaries}`);
     core.info(`Using runner: ${useRunner}`);
 
     core.setOutput('use-runner', useRunner);

@@ -8,6 +8,8 @@ Github action to determine the availability of self-hosted runners, and fallback
 
 This action uses [GitHub API](https://docs.github.com/en/rest/actions/self-hosted-runners?apiVersion=2022-11-28#list-self-hosted-runners-for-a-repository) to check the statuses of self hosted-runners that match specific labels, and outputs the runner label(s), or a fallback runner if the self-hosted runner(s) is unavailable.
 
+The API used requires an access token with org admin rights, for example a classic Personal Access Token with org:admin scope selected.
+
 This output can then used on the `runs-on` property of subsequent jobs. 
 
 Note: In order to support an array of labels for the `runs-on` field, the output is formatted as a JSON string and needs to be parsed using `fromJson`. See example usage below.
@@ -36,6 +38,15 @@ There are three ways runners can be allowed to run against a repo: User, Organiz
 | ---------------- | ------------------------------------------------------------------ |
 | `organization`   | The name of the github organization (e.g. `My-Github-Org`)         |
 | `enterprise`     | The name of the github enterprise (e.g. `My-Github-Ent`)           |
+
+It is possible that you want to use the fallback runners even if the primary runners are online,
+if the primary runners are busy. You may optionally configure this action to fallback if there
+are not enough free primaries, for example if you are adding self-hosted primaries to increase capacity, but the fallbacks are public runners in a public repo so you don't mind using them as needed.
+
+|       Name           |                     Description                 |
+| -------------------- | ----------------------------------------------- |
+| `primaries-required` | minimum non-busy primaries count, else fallback |
+
 
 
 

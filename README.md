@@ -47,6 +47,14 @@ are not enough free primaries, for example if you are adding self-hosted primari
 | -------------------- | ----------------------------------------------- |
 | `primaries-required` | minimum non-busy primaries count, else fallback |
 
+You may want the action to use the fallback runner, if correctly configured, if there are any
+errors at all. This makes it so the action won't block CI runs even if (for example) the
+github token is unavailable or expires. Default is false.
+
+|       Name          |                     Description                 |
+| ------------------- | ----------------------------------------------- |
+| `fallback-on-error` | use the fallback runner if there are any errors |
+
 
 
 
@@ -66,6 +74,8 @@ jobs:
           primary-runner: "self-hosted,linux"
           fallback-runner: "ubuntu-latest"
           github-token: ${{ secrets.YOUR_GITHUB_TOKEN }}
+          primaries-required: 1
+          fallback-on-error: false
 
   another-job:
     needs: determine-runner

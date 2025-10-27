@@ -23,6 +23,10 @@ inputs:
   primaries-required:
     description: 'Use the fallback runner if there are not at least this many primaries that are not busy'
     required: false
+  fallback-on-error:
+    description: 'Use the fallback runner if the action has any type of error, for example missing or non-functional github-token'
+    required: false
+    default: false
 outputs:
   use-runner:
     description: 'The runner to use, either the primary or the fallback runner, based on availability'

@@ -76,21 +76,33 @@ async function main() {
     apiPath = `enterprises/${enterprise}/actions/runners`;
   }
 
+  const fallbackOnError = core.getBooleanInput('fallback-on-error', { required: false });
+  let fallbackRunner;
 
   try {
+    fallbackRunner = core.getInput('fallback-runner', { required: true });
+
     const inputs = {
       apiPath,
       token: core.getInput('github-token', { required: true }),
       primaryRunnerLabels: core.getInput('primary-runner', { required: true }).split(','),
-      fallbackRunner: core.getInput('fallback-runner', { required: true }),
+      fallbackRunner,
       primariesRequired: core.getInput('primaries-required', { required: false }),
     };
 
     const { useRunner, primaryIsOnline, sufficientPrimaries, error } = await checkRunner(inputs);
 
     if (error) {
-      core.setFailed(error);
-      return;
+      if (fallbackOnError !== true) {
+        core.setFailed(error);
+        return;
+      } else {
+        core.warning('Checking for available runners failed, but fallback-on-error is true');
+        core.warning(`Error: ${error}`);
+        core.warning(`using runner: ${fallbackRunner}`);
+        core.setOutput('use-runner', fallbackRunner);
+        return;
+      }
     }
 
     core.info(`Primary runner is online: ${primaryIsOnline}`);
@@ -99,7 +111,14 @@ async function main() {
 
     core.setOutput('use-runner', useRunner);
   } catch (error) {
-    core.setFailed(error.message);
+    if (fallbackRunner === undefined || fallbackOnError !== true) {
+      core.setFailed(error);
+    } else {
+      core.warning('Checking for available runners failed, but fallback-on-error is true');
+      core.warning(`Error: ${error}`);
+      core.warning(`using runner: ${fallbackRunner}`);
+      core.setOutput('use-runner', fallbackRunner);
+    }
   }
 }
 

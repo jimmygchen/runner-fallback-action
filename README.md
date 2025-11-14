@@ -1,5 +1,13 @@
 # Github Runner Fallback Action
 
+**⚠️ Project archived**
+This repository is no longer actively maintained. I’m not reviewing or merging pull requests or issues.
+
+If you’re looking for a maintained version, check out this actively updated fork:
+**[https://github.com/mikehardy/runner-fallback-action](https://github.com/mikehardy/runner-fallback-action)**
+
+---
+
 <p align="center">
   <a href="https://github.com/jimmygchen/runner-fallback-action/actions"><img alt="javscript-action status" src="https://github.com/jimmygchen/runner-fallback-action/workflows/units-test/badge.svg"></a>
 </p>

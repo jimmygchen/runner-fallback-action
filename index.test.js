@@ -13,6 +13,10 @@ jest.mock('@actions/http-client', () => {
 });
 
 describe('checkRunner', () => {
+  beforeEach(() => {
+    mockGetJson.mockClear();
+  });
+
   it('should use the primary runner if it is online', async () => {
     mockGetJson.mockResolvedValue({
       statusCode: 200,
@@ -31,8 +35,7 @@ describe('checkRunner', () => {
 
     const result = await checkRunner({
       token: 'fake-token',
-      owner: 'fake-owner',
-      repo: 'fake-repo',
+      apiPath: 'repos/fake-owner/fake-repo/actions/runners',
       primaryRunnerLabels: ['self-hosted', 'linux'],
       fallbackRunner: 'ubuntu-latest',
     });
@@ -61,8 +64,7 @@ describe('checkRunner', () => {
 
     const result = await checkRunner({
       token: 'fake-token',
-      owner: 'fake-owner',
-      repo: 'fake-repo',
+      apiPath: 'repos/fake-owner/fake-repo/actions/runners',
       primaryRunnerLabels: ['self-hosted', 'linux'],
       fallbackRunner: 'ubuntu-latest',
     });
@@ -70,6 +72,49 @@ describe('checkRunner', () => {
     expect(result).toEqual({
       useRunner: '["ubuntu-latest"]',
       primaryIsOnline: false,
+    });
+  });
+
+  describe('alternative api handling', () => {
+    it('should query organization runners if organization is provided', async () => {
+      mockGetJson.mockResolvedValue({
+        statusCode: 200,
+        result: {
+          runners: [],
+        },
+      });
+
+      await checkRunner({
+        token: "fake-token",
+        apiPath: 'orgs/call-me-ishmael/actions/runners',
+        primaryRunnerLabels: ["self-hosted", "linux"],
+        fallbackRunner: "ubuntu-latest",
+      });
+
+      expect(mockGetJson).toHaveBeenCalledWith(
+        "https://api.github.com/orgs/call-me-ishmael/actions/runners",
+        expect.anything()
+      );
+    });
+    it('should query enterprise runners if enterprise is provided', async () => {
+      mockGetJson.mockResolvedValue({
+        statusCode: 200,
+        result: {
+          runners: [],
+        },
+      });
+
+      await checkRunner({
+        token: 'fake-token',
+        apiPath: 'enterprises/i-am-the-enterprise-now/actions/runners',
+        primaryRunnerLabels: ['self-hosted', 'linux'],
+        fallbackRunner: 'ubuntu-latest',
+      });
+
+      expect(mockGetJson).toHaveBeenCalledWith(
+        "https://api.github.com/enterprises/i-am-the-enterprise-now/actions/runners",
+        expect.anything()
+      );
     });
   });
 });
